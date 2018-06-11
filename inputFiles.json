@@ -1,0 +1,57 @@
+{
+    "files" : 
+    [
+        {
+            "name": "data.txt",
+            "tags": [
+                "Technologie"
+            ]
+        },{
+            "name": "data2.txt",
+            "tags":[
+                "Technologie"
+            ]
+        },{
+            "name": "data3.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data4.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data5.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data6.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data7.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data8.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data9.txt",
+            "tags":[
+                "Sport"
+            ]
+        },{
+            "name": "data10.txt",
+            "tags":[
+                "Sport",
+                "Tennis"
+            ]
+        }
+    ]
+}
