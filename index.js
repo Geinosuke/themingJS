@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Npm depedencies
+const is = require('@sindresorhus/is');
 const _ = require('lodash');
 
 // Internal depedencies
@@ -18,12 +19,14 @@ const getFile = async function(filepath, tags){
             words = data.toString().split(/[.,\s’()']/);
             const wordsArray = _.countBy(words);
             const histo = new Map(Object.entries(wordsArray));
-            console.log(histo);
+            // console.log(histo);
             for (let [k, v] of histo.entries()){
                 if (Bruit.has(k)){
                     histo.delete(k);
                 }
             }
+            console.log(histo.keys());
+            console.log(getGramm(3, [...histo.keys()]));
             HH.add([...histo.entries()], tags);
             resolve();
         });
@@ -37,9 +40,9 @@ const clearHistogram = function (){
 }
 
 const saveData = function (){
-    console.log(HH.tagCounter);
+    //console.log(HH.tagCounter);
     let data =  HH.tagCounter
-    console.log(data);
+    //console.log(data);
     fs.writeFile('configData.json', JSON.stringify(data.entries()), (err) => {
         console.log('Done')
     });
@@ -53,5 +56,21 @@ const run = async function() {
     await Promise.all(promises);
     //HH.displayTag();
     saveData();
+}
+
+function getGramm(k, arr){
+    if (!is.number(k))
+        throw new Error("k should be an number");
+    if (!is.array(arr))
+        throw new Error("arr should be an array");
+    let res = [];
+    for (let i = 0; i < arr.length - k + 1; i++){
+        let tmp = [];
+        for (let j = 0; j < k; j++){
+            tmp.push(arr[i + j]);
+        }
+        res.push(tmp);
+    }
+    return res;
 }
 run();
