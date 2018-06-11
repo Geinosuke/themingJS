@@ -58,4 +58,7 @@ typings/
 .env
 
 # next.js build output
-.next
+.
+
+# Mac env
+.DS_Store
