@@ -4,6 +4,7 @@
   "description": "This is a little project to explore theming using n-gramms and Jaccard index",
   "main": "index.js",
   "scripts": {
+    "start": "node .",
     "test": "npx nyc ava --verbose"
   },
   "author": "",
