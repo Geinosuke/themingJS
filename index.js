@@ -11,28 +11,31 @@ const {Tags, Bruit} = require('./Constant');
 const {HistogramHandler} = require('./HistogramHandler');
 const files = require('./inputFiles.json');
 
+// constant
+const regex = /[.,\s’()']/;
 let HH = new HistogramHandler();
+const histoArray = [];
+let cpt = 0;
 
 const getFile = async function(filepath, tags){
+    console.log(`Reading Files: ${filepath}`);
     return new Promise(function(resolve, reject){
         fs.readFile(filepath, function(err, data){
-            words = data.toString().split(/[.,\s’()']/);
-            const wordsArray = _.countBy(words);
-            const histo = new Map(Object.entries(wordsArray));
-            // console.log(histo);
-            for (let [k, v] of histo.entries()){
-                if (Bruit.has(k)){
-                    histo.delete(k);
-                }
+            // Cleaning Data
+            const histo = cleanData(data.toString(), true)
+            
+            // Get object with words in key and count in value
+            const grammsObject = _.countBy(getGramm(2, [...histo.keys()]));
+
+            // Transform count into indice
+            const dataWithIndices = getIndices(grammsObject);
+
+            if (cpt < 2){
+                histoArray.push(dataWithIndices);
+                cpt++;
             }
-            // console.log(histo.keys());
-            let tmp = _.countBy(getGramm(1, [...histo.keys()]));
-            console.log(Object.entries(tmp).length);
-            const length = Object.entries(tmp).length;
-            for (key in tmp){
-                tmp[key] /= length;
-                // console.log(tmp[key])
-            }
+            
+            //console.log(dataWithIndices);
             HH.add([...histo.entries()], tags);
             resolve();
         });
@@ -46,11 +49,9 @@ const clearHistogram = function (){
 }
 
 const saveData = function (){
-    //console.log(HH.tagCounter);
-    let data =  HH.tagCounter
-    //console.log(data);
+    const data = HH.tagCounter;
     fs.writeFile('configData.json', JSON.stringify(data.entries()), (err) => {
-        console.log('Done')
+        console.log('Data saved !');
     });
 }
 
@@ -61,6 +62,8 @@ const run = async function() {
     }
     await Promise.all(promises);
     //HH.displayTag();
+    console.log(`histoArray.length: ${histoArray.length}`);
+    getJaccard(...histoArray);
     saveData();
 }
 
@@ -82,11 +85,56 @@ function getGramm(k, arr){
     });
 }
 
-function getJaccard(){
-
+function getJaccard(first, second){
+    const total = Object.entries(first).length + Object.entries(second).length;
+    let common = getCommon(first, second);
+    if (!common)
+        common++;
+    console.log(common/total);
+    return
 }
 
 function getIndices(mapEntry){
+    if (!is.object(mapEntry))
+        throw new Error("mapEntry should be an object");
+    const length = Object.entries(mapEntry).length;
+    for (let key in mapEntry){
+        mapEntry[key] /= length;
+    }
+    return mapEntry;
+}
 
+function cleanData(data, isNoise){
+    if (!is.boolean(isNoise)){
+        throw new Error("Variable isNoise should be a boolean");
+    }
+    if (!is.string(data)){
+        throw new Error("Variable data should be a string");
+    }
+    const words = data.split(regex);
+    const wordsArray = _.countBy(words);
+    const histo = new Map(Object.entries(wordsArray));
+
+    if (isNoise){
+        for (let [k, v] of histo.entries()){
+            if (Bruit.has(k)){
+                histo.delete(k);
+            }
+        }
+    }
+    return histo;
+}
+
+function getCommon(first, second){
+    let count = 0;
+    for (let key1 in first){
+        for (let key2 in second){
+            if (key1 === key2){
+                count++;
+                console.log("here");
+            }
+        }
+    }
+    return count;
 }
 run();
