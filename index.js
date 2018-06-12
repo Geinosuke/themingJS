@@ -25,8 +25,14 @@ const getFile = async function(filepath, tags){
                     histo.delete(k);
                 }
             }
-            console.log(histo.keys());
-            console.log(getGramm(3, [...histo.keys()]));
+            // console.log(histo.keys());
+            let tmp = _.countBy(getGramm(1, [...histo.keys()]));
+            console.log(Object.entries(tmp).length);
+            const length = Object.entries(tmp).length;
+            for (key in tmp){
+                tmp[key] /= length;
+                // console.log(tmp[key])
+            }
             HH.add([...histo.entries()], tags);
             resolve();
         });
@@ -71,6 +77,16 @@ function getGramm(k, arr){
         }
         res.push(tmp);
     }
-    return res;
+    return res.map(tab => {
+        return tab.join("");
+    });
+}
+
+function getJaccard(){
+
+}
+
+function getIndices(mapEntry){
+
 }
 run();
