@@ -11,20 +11,16 @@ const {Tags, Bruit} = require('./Constant');
 const {HistogramHandler} = require('./HistogramHandler');
 const files = require('./inputFiles.json');
 
+// constant
+const regex = /[.,\s’()']/;
 let HH = new HistogramHandler();
 
 const getFile = async function(filepath, tags){
+    console.log(`Reading Files: ${filepath}`);
     return new Promise(function(resolve, reject){
         fs.readFile(filepath, function(err, data){
-            words = data.toString().split(/[.,\s’()']/);
-            const wordsArray = _.countBy(words);
-            const histo = new Map(Object.entries(wordsArray));
+            const histo = cleanData(data.toString(), true)
             // console.log(histo);
-            for (let [k, v] of histo.entries()){
-                if (Bruit.has(k)){
-                    histo.delete(k);
-                }
-            }
             // console.log(histo.keys());
             let tmp = _.countBy(getGramm(1, [...histo.keys()]));
             console.log(Object.entries(tmp).length);
@@ -88,5 +84,26 @@ function getJaccard(){
 
 function getIndices(mapEntry){
 
+}
+
+function cleanData(data, isNoise){
+    if (!is.boolean(isNoise)){
+        throw new Error("Variable isNoise should be a boolean");
+    }
+    if (!is.string(data)){
+        throw new Error("Variable data should be a string");
+    }
+    const words = data.split(regex);
+    const wordsArray = _.countBy(words);
+    const histo = new Map(Object.entries(wordsArray));
+
+    if (isNoise){
+        for (let [k, v] of histo.entries()){
+            if (Bruit.has(k)){
+                histo.delete(k);
+            }
+        }
+    }
+    return histo;
 }
 run();
