@@ -62,7 +62,6 @@ const run = async function() {
     }
     await Promise.all(promises);
     //HH.displayTag();
-    console.log(`histoArray.length: ${histoArray.length}`);
     getJaccard(...histoArray);
     saveData();
 }
@@ -88,9 +87,7 @@ function getGramm(k, arr){
 function getJaccard(first, second){
     const total = Object.entries(first).length + Object.entries(second).length;
     let common = getCommon(first, second);
-    if (!common)
-        common++;
-    console.log(common/total);
+    console.log(`This is Jaccard index: ${common/total}`);
     return
 }
 
@@ -126,6 +123,8 @@ function cleanData(data, isNoise){
 }
 
 function getCommon(first, second){
+    if (!is.object(first) || !is.object(second))
+        throw new Error("GetCommon parameter should be object");
     let count = 0;
     for (let key1 in first){
         for (let key2 in second){
@@ -138,3 +137,11 @@ function getCommon(first, second){
     return count;
 }
 run();
+
+module.exports = {
+    getCommon,
+    cleanData,
+    getIndices,
+    getGramm,
+    getJaccard
+}
