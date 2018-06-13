@@ -123,14 +123,11 @@ function cleanData(data, isNoise){
 }
 
 function getCommon(first, second){
-    if (!is.object(first) || !is.object(second))
-        throw new Error("GetCommon parameter should be object");
     let count = 0;
     for (let key1 in first){
         for (let key2 in second){
             if (key1 === key2){
                 count++;
-                console.log("here");
             }
         }
     }
