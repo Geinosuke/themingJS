@@ -25,6 +25,9 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
         
       - run: npm run test
+  deployment:
+    steps:
+      - run: ls
 
 workflows:
   version: 2
