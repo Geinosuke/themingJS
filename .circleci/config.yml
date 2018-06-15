@@ -26,6 +26,8 @@ jobs:
         
       - run: npm run test
   deployment:
+    docker:
+      - image: circleci/node:10
     steps:
       - run: ls
 
