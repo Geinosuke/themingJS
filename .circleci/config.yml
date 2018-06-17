@@ -30,8 +30,9 @@ jobs:
     steps:
       - checkout
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - command:
-        - >-
+      - push:
+        name: if master publish on npm
+        command:
           if [ "${CIRCLE_BRANCH}" == "master" ]; then 
             npm publish
           fi
