@@ -35,7 +35,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then \
               npm publish \
-            fi
+            fi \
 
 workflows:
   version: 2
