@@ -34,6 +34,7 @@ jobs:
           name: if master publish on npm
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then \
+              echo "THIS is it" \
               npm publish; \
             fi \
 
