@@ -71,19 +71,3 @@ test('GetCommon - Valid parameters all exact', t => {
     const resShouldBe = 3;
     t.is(getCommon(first, second), resShouldBe);
 });
-/*
-test('GetCommon - Type checking', t => {
-    const first = [];
-    const second = {
-        "param4": 3,
-        "param5": 3,
-        "param6": 3,
-    };
-    const resShouldBe = 0;
-	const error = t.throws(() => {
-		getCommon(first, second)
-	}, Error);
-
-	t.is(error.message, 'GetCommon parameter should be object');
-});
-*/
