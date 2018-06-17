@@ -1,6 +1,6 @@
 {
   "name": "themingjs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "This is a little project to explore theming using n-gramms and Jaccard index",
   "main": "index.js",
   "scripts": {
