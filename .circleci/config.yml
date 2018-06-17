@@ -1,7 +1,6 @@
 # Javascript Node CircleCI 2.0 configuration file
-#
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
+
 version: 2
 dependencies:
   pre:
@@ -31,7 +30,11 @@ jobs:
     steps:
       - checkout
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: npm publish
+      - command:
+        - >-
+          if [ "${CIRCLE_BRANCH}" == "master" ]; then 
+            npm publish
+          fi
 
 workflows:
   version: 2
