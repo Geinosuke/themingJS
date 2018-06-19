@@ -133,7 +133,7 @@ function getCommon(first, second){
     }
     return count;
 }
-run();
+// run();
 
 module.exports = {
     getCommon,
