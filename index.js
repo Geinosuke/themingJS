@@ -48,9 +48,10 @@ const countWords = function(){
 const clearHistogram = function (){
 }
 
-const saveData = function (){
-    const data = HH.tagCounter;
-    fs.writeFile('configData.json', JSON.stringify(data.entries()), (err) => {
+const saveData = function (data){
+    // const data = HH.tagCounter;
+    console.log(data)
+    fs.writeFile('configData.json', JSON.stringify(data), (err) => {
         console.log('Data saved !');
     });
 }
@@ -61,9 +62,9 @@ const run = async function() {
         promises.push(getFile('./data/' + file.name, file.tags));
     }
     await Promise.all(promises);
-    //HH.displayTag();
+    // HH.displayTag();
     getJaccard(...histoArray);
-    saveData();
+    saveData(histoArray);
 }
 
 function getGramm(k, arr){
@@ -88,7 +89,7 @@ function getJaccard(first, second){
     const total = Object.entries(first).length + Object.entries(second).length;
     let common = getCommon(first, second);
     console.log(`This is Jaccard index: ${common/total}`);
-    return
+    return common/total;
 }
 
 function getIndices(mapEntry){
@@ -133,7 +134,7 @@ function getCommon(first, second){
     }
     return count;
 }
-run();
+// run();
 
 module.exports = {
     getCommon,
