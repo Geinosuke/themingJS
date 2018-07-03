@@ -14,7 +14,7 @@ const dico = require('./dico.json');
 const dicoHisto = new Map([...Object.entries(dico)]);
 
 // constant
-const regex = /[.,\s’()']/;
+const regex = /[.,\s’()'"]/;
 let HH = new HistogramHandler();
 const histoArray = [];
 let cpt = 0;
@@ -149,13 +149,13 @@ function cleanData(data, isNoise){
     const histo = new Map(Object.entries(wordsArray));
     if (isNoise){
         for (let [k, v] of histo.entries()){
-            if (Bruit.has(k)){
+            if (Bruit.has(k.toLowerCase())){
                 histo.delete(k);
                 continue;
             }
-            if (dicoHisto.has(k)){
+            if (dicoHisto.has(k.toLowerCase())){
                 histo.delete(k)
-                histo.set(dicoHisto.get(k), v);
+                histo.set(dicoHisto.get(k.toLowerCase()), v);
             }
         }
     }
