@@ -10,6 +10,8 @@ const _ = require('lodash');
 const {Tags, Bruit} = require('./Constant');
 const {HistogramHandler} = require('./HistogramHandler');
 const files = require('./inputFiles.json');
+const dico = require('./dico.json');
+const dicoHisto = new Map([...Object.entries(dico)]);
 
 // constant
 const regex = /[.,\s’()']/;
@@ -145,11 +147,15 @@ function cleanData(data, isNoise){
     const words = data.split(regex);
     const wordsArray = _.countBy(words);
     const histo = new Map(Object.entries(wordsArray));
-
     if (isNoise){
         for (let [k, v] of histo.entries()){
             if (Bruit.has(k)){
                 histo.delete(k);
+                continue;
+            }
+            if (dicoHisto.has(k)){
+                histo.delete(k)
+                histo.set(dicoHisto.get(k), v);
             }
         }
     }
