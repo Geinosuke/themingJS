@@ -85,10 +85,43 @@ function getGramm(k, arr){
     });
 }
 
+function getTF(gramm, arrGramm){
+    if (!is.number(gramm))
+        throw new Error("gramm should be a string");
+    if (!is.array(arrGramm) || arrGramm.length === 0)
+        throw new Error("arrGram should be an array");
+    let count = 0;
+    arrGramm.forEach(element => {
+        if (element === gramm)
+            count++;
+    });
+    return count/arrGramm.length;
+}
+
+function getIDF(gramm, arrCorpus){
+    if (!is.number(gramm))
+        throw new Error("gramm should be a string");
+    if (!is.array(arrCorpus) || arrCorpus.length === 0)
+        throw new Error("arrCorpus should be an array");
+    let count = 0;
+    for (let document of arrCorpus){
+        for (let token of document){
+            if (token === gramm){
+                count++;
+                break;
+            }
+        }
+    }
+    return Math.log10(arrCorpus.length/count);
+}
+
+function getTFIDF(gramm, currentDocument, arrCorpus){
+    return getTF(gramm, currentDocument) * getIDF(gramm, arrCorpus);
+}
+
 function getJaccard(first, second){
     const total = Object.entries(first).length + Object.entries(second).length;
     let common = getCommon(first, second);
-    console.log(`This is Jaccard index: ${common/total}`);
     return common/total;
 }
 
