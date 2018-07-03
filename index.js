@@ -144,9 +144,11 @@ function cleanData(data, isNoise){
     if (!is.string(data)){
         throw new Error("Variable data should be a string");
     }
+    Bruit.add(" ");
     const words = data.split(regex);
     const wordsArray = _.countBy(words);
     const histo = new Map(Object.entries(wordsArray));
+    const modifs = [];
     if (isNoise){
         for (let [k, v] of histo.entries()){
             if (Bruit.has(k.toLowerCase())){
@@ -155,10 +157,13 @@ function cleanData(data, isNoise){
             }
             if (dicoHisto.has(k.toLowerCase())){
                 histo.delete(k)
-                histo.set(dicoHisto.get(k.toLowerCase()), v);
+                modifs.push([dicoHisto.get(k.toLowerCase()), v])
             }
         }
     }
+    modifs.forEach(item => {
+        histo.set(item[0], item[1]);
+    })
     return histo;
 }
 
