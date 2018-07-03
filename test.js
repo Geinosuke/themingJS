@@ -2,7 +2,7 @@ import test from 'ava';
 const { testFunction } = require('./Constant.js');
 const { 
     getCommon,
-    cleanData,''
+    cleanData,
     getIndices,
     getGramm,
     getJaccard
