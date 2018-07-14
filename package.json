@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "test": "npx nyc ava --verbose",
+    "test": "npx nyc ava --verbose tests/test.js",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint --fix ."
   },

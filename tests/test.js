@@ -1,4 +1,5 @@
 import test from 'ava';
+
 const files = require('./inputFiles.json');
 const fs = require('fs');
 const {
@@ -7,7 +8,7 @@ const {
   getIndices,
   getGramm,
   getJaccard,
-} = require('./index');
+} = require('../index');
 
 const getFile = async function (filepath, tags) {
   console.log(`Reading Files: ${filepath}`);
