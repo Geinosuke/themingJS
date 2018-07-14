@@ -25,7 +25,7 @@ function getGramm(k, textArray) {
 }
 
 function getTF(gramm, grammList) {
-  if (!is.number(gramm)) throw new Error('Parameter gramm should be a string');
+  if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
   if (!is.array(grammList) || grammList.length === 0) throw new Error('Parameter grammList should be an array');
   let count = 0;
   grammList.forEach((element) => {
@@ -35,7 +35,7 @@ function getTF(gramm, grammList) {
 }
 
 function getIDF(gramm, corpus) {
-  if (!is.number(gramm)) throw new Error('Parameter gramm should be a string');
+  if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
   if (!is.array(corpus) || corpus.length === 0) throw new Error('Parameter corpus should be an array');
   let count = 0;
   corpus.forEach((document) => {
@@ -75,7 +75,7 @@ function splitStringInput(input) {
   if (!is.string(input)) {
     throw new Error('Parameter input parameter should be a string');
   }
-  return input.split(regex);
+  return input.split(regex).filter(word => word !== '');
 }
 
 function cleanNoise(input) {
@@ -83,14 +83,14 @@ function cleanNoise(input) {
     throw new Error('input parameter should be a array');
   }
   Noise.add(' '); // refacto
-  input.map((word) => {
+  return input.map((word) => {
     if (!Noise.has(word)) {
       return word;
     }
   }).filter(word => word !== undefined);
 }
 
-function lemmatisation(input) {
+function lemmatisate(input) {
   if (!is.array(input)) {
     throw new Error('input parameter should be a array');
   }
@@ -129,4 +129,10 @@ module.exports = {
   cleanData,
   getGramm,
   getJaccard,
+  getTF,
+  getIDF,
+  getTFIDF,
+  splitStringInput,
+  cleanNoise,
+  lemmatisate,
 };
