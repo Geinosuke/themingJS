@@ -1,11 +1,10 @@
 import test from 'ava';
 
-const files = require('./inputFiles.json');
-const fs = require('fs');
+// const files = require('./inputFiles.json');
+// const fs = require('fs');
 const {
   getCommon,
   cleanData,
-  getIndices,
   getGramm,
   getJaccard,
 } = require('../index');
@@ -35,7 +34,9 @@ const getFile = async function (filepath, tags) {
   }));
 };
 
-// Test getCommon function
+/*
+** Test getCommon function
+*/
 test('GetCommon - Valid parameters two exact', (t) => {
   const first = {
     param1: 3,
@@ -80,4 +81,63 @@ test('GetCommon - Valid parameters all exact', (t) => {
   };
   const resShouldBe = 3;
   t.is(getCommon(first, second), resShouldBe);
+});
+
+/*
+** Test getGramm function
+*/
+
+const text = 'Luke, je suis ton père'.split(' ');
+
+const res1gramm = [
+  'Luke,',
+  'je',
+  'suis',
+  'ton',
+  'père',
+];
+const res2gramm = [
+  'Luke,je',
+  'jesuis',
+  'suiston',
+  'tonpère',
+];
+const res3gramm = [
+  'Luke,jesuis',
+  'jesuiston',
+  'suistonpère',
+];
+const res4gramm = [
+  'Luke,jesuiston',
+  'jesuistonpère',
+];
+
+test('getGramm - Get 1-Gramms', (t) => {
+  t.deepEqual(getGramm(1, text), res1gramm);
+});
+
+test('getGramm - Get 2-Gramms', (t) => {
+  t.deepEqual(getGramm(2, text), res2gramm);
+});
+
+test('getGramm - Get 3-Gramms', (t) => {
+  t.deepEqual(getGramm(3, text), res3gramm);
+});
+
+test('getGramm - Get 4-Gramms', (t) => {
+  t.deepEqual(getGramm(4, text), res4gramm);
+});
+
+test('getGramm - Should throw error if k parameter is not a number', (t) => {
+  const error = t.throws(() => {
+    getGramm('4', text);
+  }, Error);
+  t.is(error.message, 'k should be an number');
+});
+
+test('getGramm - Should throw error if textArray parameter is not an array', (t) => {
+  const error = t.throws(() => {
+    getGramm(4, {});
+  }, Error);
+  t.is(error.message, 'textArray should be an array');
 });

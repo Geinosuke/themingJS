@@ -8,7 +8,7 @@ const dico = require('./dico.json');
 
 // Constant
 const regex = /[.,\s’()'"]/;
-const dicoMap= new Map([...Object.entries(dico)]);
+const dicoMap = new Map([...Object.entries(dico)]);
 
 function getGramm(k, textArray) {
   if (!is.number(k)) throw new Error('k should be an number');
@@ -51,7 +51,6 @@ function cleanData(input, isNoise) {
   if (!is.string(input)) {
     throw new Error('input parameter should be a string');
   }
-  Noise.add(' ');
   const words = input.split(regex);
   const wordsArray = _.countBy(words);
   const histo = new Map(Object.entries(wordsArray));

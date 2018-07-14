@@ -5,6 +5,8 @@ const Alpha = 'abcdefghijklmnopqrstuvwxyz'.split('');
 const Mais = 'si ainsi lors pour ou mais ou est donc or ni car'.split(' ');
 const Noise = new Set([...Articles, ...Autres, ...Alpha, ...Mais]);
 
+Noise.add(' ');
+
 module.exports = {
   Tags,
   Noise,
