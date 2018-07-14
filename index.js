@@ -8,7 +8,7 @@ const dico = require('./dico.json');
 
 // Constant
 const regex = /[.,\s’()'"]/;
-const dicoHisto = new Map([...Object.entries(dico)]);
+const dicoMap= new Map([...Object.entries(dico)]);
 
 function getGramm(k, textArray) {
   if (!is.number(k)) throw new Error('k should be an number');
@@ -60,9 +60,9 @@ function cleanData(input, isNoise) {
     histo.entries().forEach((item) => {
       if (Noise.has(item[0].toLowerCase())) {
         histo.delete(item[0]);
-      } else if (dicoHisto.has(item[0].toLowerCase())) {
+      } else if (dicoMap.has(item[0].toLowerCase())) {
         histo.delete(item[0]);
-        modifs.push([dicoHisto.get(item[0].toLowerCase()), item[1]]);
+        modifs.push([dicoMap.get(item[0].toLowerCase()), item[1]]);
       }
     });
   }
@@ -70,6 +70,37 @@ function cleanData(input, isNoise) {
     histo.set(item[0], item[1]);
   });
   return histo;
+}
+
+function splitStringInput(input) {
+  if (!is.string(input)) {
+    throw new Error('Parameter input parameter should be a string');
+  }
+  return input.split(regex);
+}
+
+function cleanNoise(input) {
+  if (!is.array(input)) {
+    throw new Error('input parameter should be a array');
+  }
+  Noise.add(' '); // refacto
+  input.map((word) => {
+    if (!Noise.has(word)) {
+      return word;
+    }
+  }).filter(word => word !== undefined);
+}
+
+function lemmatisation(input) {
+  if (!is.array(input)) {
+    throw new Error('input parameter should be a array');
+  }
+  return input.map((word) => {
+    if (dicoMap.has(word)) {
+      return dicoMap.get(word);
+    }
+    return word;
+  });
 }
 
 function getCommon(first, second) {
