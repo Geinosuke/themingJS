@@ -3,7 +3,7 @@ const is = require('@sindresorhus/is');
 const _ = require('lodash');
 
 // Internal depedencies
-const { Noise } = require('./Constant');
+const { Noise } = require('./constant');
 const dico = require('./dico.json');
 
 // Constant
