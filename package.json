@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "test": "npx nyc ava --verbose"
+    "test": "npx nyc ava --verbose",
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint --fix ."
   },
   "author": "",
   "license": "ISC",
@@ -15,5 +17,10 @@
     "eslint": "^4.19.1",
     "lodash": "^4.17.10",
     "nyc": "^11.9.0"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "jsdoc": "^3.5.5"
   }
 }
