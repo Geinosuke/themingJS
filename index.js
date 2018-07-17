@@ -41,41 +41,10 @@ function getIDF(gramm, corpus) {
   corpus.forEach((document) => {
     if (document.some(token => token === gramm)) count += 1;
   });
-  return Math.log10(corpus.length / count);
-}
-
-function cleanData(input, isNoise) {
-  if (!is.boolean(isNoise)) {
-    throw new Error('isNoise parameter should be a boolean');
+  if (count) {
+    return Math.log10(corpus.length / count);
   }
-  if (!is.string(input)) {
-    throw new Error('input parameter should be a string');
-  }
-  const words = input.split(regex);
-  const wordsArray = _.countBy(words);
-  const histo = new Map(Object.entries(wordsArray));
-  const modifs = [];
-  if (isNoise) {
-    histo.entries().forEach((item) => {
-      if (Noise.has(item[0].toLowerCase())) {
-        histo.delete(item[0]);
-      } else if (dicoMap.has(item[0].toLowerCase())) {
-        histo.delete(item[0]);
-        modifs.push([dicoMap.get(item[0].toLowerCase()), item[1]]);
-      }
-    });
-  }
-  modifs.forEach((item) => {
-    histo.set(item[0], item[1]);
-  });
-  return histo;
-}
-
-function splitStringInput(input) {
-  if (!is.string(input)) {
-    throw new Error('Parameter input parameter should be a string');
-  }
-  return input.split(regex).filter(word => word !== '');
+  return count;
 }
 
 function cleanNoise(input) {
@@ -102,11 +71,34 @@ function lemmatisate(input) {
   });
 }
 
+function cleanData(input, isNoise) {
+  if (!is.boolean(isNoise)) {
+    throw new Error('\'isNoise\' parameter should be a boolean');
+  }
+  if (!is.array(input)) {
+    throw new Error('\'Input\' parameter should be an array');
+  }
+  if (isNoise) {
+    return lemmatisate(cleanNoise(input));
+  }
+  return lemmatisate(input);
+}
+
+function splitStringInput(input) {
+  if (!is.string(input)) {
+    throw new Error('Parameter input parameter should be a string');
+  }
+  return input.split(regex).filter(word => word !== '');
+}
+
 function getCommon(first, second) {
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
   let count = 0;
-  Object.keys(first).forEach((key1) => {
-    Object.keys(second).forEach((key2) => {
-      if (key1 === key2) {
+  first.forEach((keySecond) => {
+    second.forEach((keyFirst) => {
+      if (keySecond === keyFirst) {
         count += 1;
       }
     });
@@ -117,11 +109,24 @@ function getCommon(first, second) {
 function getTFIDF(gramm, currentDocument, corpus) {
   return getTF(gramm, currentDocument) * getIDF(gramm, corpus);
 }
+function getUnion(first, second) {
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
+  let count = first.length;
+  second.forEach((keySecond) => {
+    if (!first.some(keyFirst => keySecond === keyFirst)) {
+      count += 1;
+    }
+  });
+  return count;
+}
 
 function getJaccard(first, second) {
-  const total = Object.entries(first).length + Object.entries(second).length;
-  const common = getCommon(first, second);
-  return common / total;
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
+  return getCommon(first, second) / getUnion(first, second);
 }
 
 module.exports = {
@@ -135,4 +140,5 @@ module.exports = {
   splitStringInput,
   cleanNoise,
   lemmatisate,
+  getUnion,
 };

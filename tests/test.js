@@ -7,9 +7,13 @@ const {
   getGramm,
   getTF,
   getIDF,
+  getTFIDF,
   splitStringInput,
   cleanNoise,
   lemmatisate,
+  getJaccard,
+  getUnion,
+  cleanData,
 } = require('../index');
 /*
 const getFile = async function (filepath, tags) {
@@ -40,6 +44,24 @@ const getFile = async function (filepath, tags) {
 /*
 ** Test getCommon function
 */
+
+test('GetCommon - Should throw error if parameters are not arrays', (t) => {
+  const first = {
+    param1: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const second = {
+    param4: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const error = t.throws(() => {
+    getCommon(first, second);
+  }, Error);
+  t.is(error.message, 'Parameter should be arrays');
+});
+
 test('GetCommon - Valid parameters two exact', (t) => {
   const first = {
     param1: 3,
@@ -52,7 +74,7 @@ test('GetCommon - Valid parameters two exact', (t) => {
     param3: 3,
   };
   const resShouldBe = 2;
-  t.is(getCommon(first, second), resShouldBe);
+  t.is(getCommon(Object.keys(first), Object.keys(second)), resShouldBe);
 });
 
 test('GetCommon - Valid parameters none exact', (t) => {
@@ -67,7 +89,7 @@ test('GetCommon - Valid parameters none exact', (t) => {
     param6: 3,
   };
   const resShouldBe = 0;
-  t.is(getCommon(first, second), resShouldBe);
+  t.is(getCommon(Object.keys(first), Object.keys(second)), resShouldBe);
 });
 
 test('GetCommon - Valid parameters all exact', (t) => {
@@ -83,7 +105,7 @@ test('GetCommon - Valid parameters all exact', (t) => {
     param5: 'test',
   };
   const resShouldBe = 3;
-  t.is(getCommon(first, second), resShouldBe);
+  t.is(getCommon(Object.keys(first), Object.keys(second)), resShouldBe);
 });
 
 /*
@@ -216,7 +238,15 @@ test('getIDF - 1 gramm when 1 occured last word', (t) => {
 });
 
 test('getIDF - 1 gramm when 0 occured', (t) => {
-  t.is(getIDF('WTF', [text1, text2, text3]), Math.log10(3 / 0));
+  t.is(getIDF('WTF', [text1, text2, text3]), 0);
+});
+
+/*
+** Test getTFIDF function
+*/
+
+test('getTFIDF', (t) => {
+  t.is(getTFIDF('Luke,', res1gramm, [text1, text2, text3]), 0.09542425094393249);
 });
 
 /*
@@ -281,4 +311,133 @@ test('cleanNoise - Should throw error if input parameter is not an array', (t) =
 
 test('cleanNoise - handle apostrophe', (t) => {
   t.deepEqual(cleanNoise(textSplitted1), textWithoutNoise1);
+});
+
+/*
+** Test lemmatisate function
+*/
+
+test('lemmatisate - Should throw error if input parameter is not an array', (t) => {
+  const error = t.throws(() => {
+    lemmatisate(42);
+  }, Error);
+  t.is(error.message, 'input parameter should be a array');
+});
+
+test('lemmatisate - ', (t) => {
+  t.deepEqual(lemmatisate(textWithoutNoise1), ['Luke', 'jtre', 'père']); // check value of lemme "suis"
+});
+
+/*
+** Test getJaccard function
+*/
+
+test('GetJaccard - Should throw error if parameters are not arrays', (t) => {
+  const first = {
+    param1: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const second = {
+    param4: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const error = t.throws(() => {
+    getJaccard(first, Object.keys(second));
+  }, Error);
+  t.is(error.message, 'Parameter should be arrays');
+});
+
+test('GetJaccard - ', (t) => {
+  const first = {
+    param1: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const second = {
+    param4: 3,
+    param2: 3,
+    param3: 3,
+  };
+  t.is(getJaccard(Object.keys(first), Object.keys(second)), 2 / 4);
+});
+
+/*
+** Test GetUnion function
+*/
+
+test('GetUnion - Should throw error if parameters are not arrays', (t) => {
+  const first = {
+    param1: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const second = {
+    param4: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const error = t.throws(() => {
+    getUnion(first, Object.keys(second));
+  }, Error);
+  t.is(error.message, 'Parameter should be arrays');
+});
+
+test('GetUnion - ', (t) => {
+  const first = {
+    param1: 3,
+    param2: 3,
+    param3: 3,
+  };
+  const second = {
+    param4: 3,
+    param2: 3,
+    param3: 3,
+  };
+  t.is(getUnion(Object.keys(first), Object.keys(second)), 4);
+});
+
+/*
+** Test CleanData function
+*/
+
+test('CleanData - Should throw error if input parameter is not an array', (t) => {
+  const error = t.throws(() => {
+    cleanData('input', true);
+  }, Error);
+  t.is(error.message, '\'Input\' parameter should be an array');
+});
+
+test('CleanData - Should throw error if isNoise parameter is not boolean', (t) => {
+  const error = t.throws(() => {
+    cleanData([], 'true');
+  }, Error);
+  t.is(error.message, '\'isNoise\' parameter should be a boolean');
+});
+
+test('CleanData - When input is empty and isNoise true', (t) => {
+  t.deepEqual(cleanData([], true), []);
+});
+
+test('CleanData - When input is empty and isNoise false', (t) => {
+  t.deepEqual(cleanData([], false), []);
+});
+
+test('CleanData - when isNoise = false', (t) => {
+  t.deepEqual(cleanData(textSplitted1, false), [
+    'Luke',
+    'je',
+    'jtre',
+    'ton',
+    'père',
+  ]);
+});
+
+test('CleanData - when isNoise = true', (t) => {
+  t.deepEqual(cleanData(textSplitted1, true), [
+    'Luke',
+    'jtre',
+    'père',
+  ]);
 });
