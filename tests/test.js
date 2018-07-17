@@ -1,7 +1,5 @@
 import test from 'ava';
 
-// const files = require('./inputFiles.json');
-// const fs = require('fs');
 const {
   getCommon,
   getGramm,
@@ -15,31 +13,6 @@ const {
   getUnion,
   cleanData,
 } = require('../index');
-/*
-const getFile = async function (filepath, tags) {
-  console.log(`Reading Files: ${filepath}`);
-  return new Promise(((resolve, reject) => {
-    fs.readFile(filepath, (err, input) => {
-      // Cleaning input
-      const histo = cleanData(input.toString(), true);
-
-      // Get object with words in key and count in Luke
-      const grammsObject = _.countBy(getGramm(2, [...histo.keys()]));
-
-      // Transform count into indice
-      const inputWithIndices = getIndices(grammsObject);
-
-      if (cpt < 2) {
-        histoArray.push(inputWithIndices);
-        cpt++;
-      }
-
-      // console.log(inputWithIndices);
-      HH.add([...histo.entries()], tags);
-      resolve();
-    });
-  }));
-}; */
 
 /*
 ** Test getCommon function
