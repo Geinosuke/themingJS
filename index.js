@@ -165,9 +165,25 @@ function getCommon(first, second) {
   return count;
 }
 
+/**
+ * Return TFIDF value for the gramm 'gramm'.
+ * @function
+ * @param {string} gramm - word.
+ * @param {array} currentDocument - Input text.
+ * @param {array} corpus - Array of text.
+ * @returns {number}
+ */
 function getTFIDF(gramm, currentDocument, corpus) {
   return getTF(gramm, currentDocument) * getIDF(gramm, corpus);
 }
+
+/**
+ * Return the number of common words between 'first' and 'second' arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
 function getUnion(first, second) {
   if (!is.array(first) || !is.array(second)) {
     throw new Error('Parameter should be arrays');
@@ -181,6 +197,13 @@ function getUnion(first, second) {
   return count;
 }
 
+/**
+ * Return the Jaccard indice bewteen 'first' and 'second' arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
 function getJaccard(first, second) {
   if (!is.array(first) || !is.array(second)) {
     throw new Error('Parameter should be arrays');
