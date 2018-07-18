@@ -1,6 +1,5 @@
 // Npm depedencies
 const is = require('@sindresorhus/is');
-const _ = require('lodash');
 
 // Internal depedencies
 const { Noise } = require('./constant');
@@ -9,6 +8,14 @@ const dico = require('./dico.json');
 // Constant
 const regex = /[.,\s’()'"]/;
 const dicoMap = new Map([...Object.entries(dico)]);
+
+/**
+ * Transform an array of words into an array of k-gramms.
+ * @function
+ * @param {number} k - Size of the gramms wanted.
+ * @param {array} textArray - Array of words.
+ * @returns {array}
+ */
 
 function getGramm(k, textArray) {
   if (!is.number(k)) throw new Error('k should be an number');
@@ -24,6 +31,13 @@ function getGramm(k, textArray) {
   return grammList.map(tab => tab.join(''));
 }
 
+/**
+ * Return gramm's TF value for the list of gramm 'grammList'.
+ * @function
+ * @param {string} gramm - Input gramms.
+ * @param {array} grammList - Array of gramms.
+ * @returns {number}
+ */
 function getTF(gramm, grammList) {
   if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
   if (!is.array(grammList) || grammList.length === 0) throw new Error('Parameter grammList should be an array');
@@ -33,6 +47,14 @@ function getTF(gramm, grammList) {
   });
   return count / grammList.length;
 }
+
+/**
+ * Return gramm's IDF value for the corpus of text 'corpus'.
+ * @function
+ * @param {string} gramm - Input gramms.
+ * @param {array} corpus - Array of text.
+ * @returns {number}
+ */
 
 function getIDF(gramm, corpus) {
   if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
@@ -47,6 +69,13 @@ function getIDF(gramm, corpus) {
   return count;
 }
 
+/**
+ * Remove all words from the 'input' array that are considered noise.
+ * @function
+ * @param {array} input - Array of words.
+ * @returns {array}
+ */
+
 function cleanNoise(input) {
   if (!is.array(input)) {
     throw new Error('input parameter should be a array');
@@ -55,9 +84,16 @@ function cleanNoise(input) {
   return input.map((word) => {
     if (!Noise.has(word)) {
       return word;
-    }
+    } // return undefined ? or do it with null
   }).filter(word => word !== undefined);
 }
+
+/**
+ * Replace words by their lemme.
+ * @function
+ * @param {array} input - Array of words.
+ * @returns {array}
+ */
 
 function lemmatisate(input) {
   if (!is.array(input)) {
@@ -70,6 +106,14 @@ function lemmatisate(input) {
     return word;
   });
 }
+
+/**
+ * Remove noide words from the array and replace remaining words by their lemme.
+ * @function
+ * @param {array} input - Array of words.
+ * @param {boolean} isNoise - Boolean that weather or not remove noise.
+ * @returns {array}
+ */
 
 function cleanData(input, isNoise) {
   if (!is.boolean(isNoise)) {
@@ -84,12 +128,27 @@ function cleanData(input, isNoise) {
   return lemmatisate(input);
 }
 
+/**
+ * Split a string into a array of words.
+ * @function
+ * @param {string} input - Input string.
+ * @returns {array}
+ */
+
 function splitStringInput(input) {
   if (!is.string(input)) {
     throw new Error('Parameter input parameter should be a string');
   }
   return input.split(regex).filter(word => word !== '');
 }
+
+/**
+ * Count the number of same words in the two arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
 
 function getCommon(first, second) {
   if (!is.array(first) || !is.array(second)) {

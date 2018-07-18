@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node .",
     "test": "npx nyc ava --verbose tests/test.js",
-    "lint": "npx eslint .",
-    "lint:fix": "npx eslint --fix ."
+    "lint": "npx eslint index.js",
+    "lint:fix": "npx eslint --fix index.js",
+    "doc": "npx jsdoc index.js"
   },
   "author": "",
   "license": "ISC",
