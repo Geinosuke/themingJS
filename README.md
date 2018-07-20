@@ -6,15 +6,4 @@
 
 This package implements algorithms and concepts that are use in Natural Language Processing. Concepts such as K-Gramms, lemmatisation, TFIDF indice etc...
 
-## Noise
-
-## Lemmatisation
-
-## Gramm
-
-## TF IDF
-
-## Jaccard indice
-
-## TODO
-- JSDoc on heroku
+You can find the whole API documentation [here](https://themingjsdoc.herokuapp.com/index.html) 
