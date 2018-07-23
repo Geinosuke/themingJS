@@ -62,3 +62,7 @@ typings/
 
 # Mac env
 .DS_Store
+
+# Custom
+configData.json
+out

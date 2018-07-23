@@ -1,189 +1,226 @@
-// Node depedencies
-const fs = require('fs');
-const path = require('path');
-
 // Npm depedencies
 const is = require('@sindresorhus/is');
-const _ = require('lodash');
 
 // Internal depedencies
-const {Tags, Bruit} = require('./Constant');
-const {HistogramHandler} = require('./HistogramHandler');
-const files = require('./inputFiles.json');
+const { Noise } = require('./constant');
 const dico = require('./dico.json');
-const dicoHisto = new Map([...Object.entries(dico)]);
 
-// constant
+// Constant
 const regex = /[.,\s’()'"]/;
-let HH = new HistogramHandler();
-const histoArray = [];
-let cpt = 0;
+const dicoMap = new Map([...Object.entries(dico)]);
 
-const getFile = async function(filepath, tags){
-    console.log(`Reading Files: ${filepath}`);
-    return new Promise(function(resolve, reject){
-        fs.readFile(filepath, function(err, data){
-            // Cleaning Data
-            const histo = cleanData(data.toString(), true)
-            
-            // Get object with words in key and count in value
-            const grammsObject = _.countBy(getGramm(2, [...histo.keys()]));
+/**
+ * Transform an array of words into an array of k-gramms.
+ * @function
+ * @param {number} k - Size of the gramms wanted.
+ * @param {array} textArray - Array of words.
+ * @returns {array}
+ */
 
-            // Transform count into indice
-            const dataWithIndices = getIndices(grammsObject);
+function getGramm(k, textArray) {
+  if (!is.number(k)) throw new Error('k should be an number');
+  if (!is.array(textArray)) throw new Error('textArray should be an array');
+  const grammList = [];
+  for (let i = 0; i < textArray.length - k + 1; i += 1) {
+    const tokens = [];
+    for (let j = 0; j < k; j += 1) {
+      tokens.push(textArray[i + j]);
+    }
+    grammList.push(tokens);
+  }
+  return grammList.map(tab => tab.join(''));
+}
 
-            if (cpt < 2){
-                histoArray.push(dataWithIndices);
-                cpt++;
-            }
-            
-            //console.log(dataWithIndices);
-            HH.add([...histo.entries()], tags);
-            resolve();
-        });
+/**
+ * Return gramm's TF value for the list of gramm 'grammList'.
+ * @function
+ * @param {string} gramm - Input gramms.
+ * @param {array} grammList - Array of gramms.
+ * @returns {number}
+ */
+function getTF(gramm, grammList) {
+  if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
+  if (!is.array(grammList) || grammList.length === 0) throw new Error('Parameter grammList should be an array');
+  let count = 0;
+  grammList.forEach((element) => {
+    if (element === gramm) count += 1;
+  });
+  return count / grammList.length;
+}
+
+/**
+ * Return gramm's IDF value for the corpus of text 'corpus'.
+ * @function
+ * @param {string} gramm - Input gramms.
+ * @param {array} corpus - Array of text.
+ * @returns {number}
+ */
+
+function getIDF(gramm, corpus) {
+  if (!is.string(gramm)) throw new Error('Parameter gramm should be a string');
+  if (!is.array(corpus) || corpus.length === 0) throw new Error('Parameter corpus should be an array');
+  let count = 0;
+  corpus.forEach((document) => {
+    if (document.some(token => token === gramm)) count += 1;
+  });
+  if (count) {
+    return Math.log10(corpus.length / count);
+  }
+  return count;
+}
+
+/**
+ * Remove all words from the 'input' array that are considered noise.
+ * @function
+ * @param {array} input - Array of words.
+ * @returns {array}
+ */
+
+function cleanNoise(input) {
+  if (!is.array(input)) {
+    throw new Error('input parameter should be a array');
+  }
+  Noise.add(' '); // refacto
+  return input.map((word) => {
+    if (!Noise.has(word)) {
+      return word;
+    } // return undefined ? or do it with null
+  }).filter(word => word !== undefined);
+}
+
+/**
+ * Replace words by their lemme.
+ * @function
+ * @param {array} input - Array of words.
+ * @returns {array}
+ */
+
+function lemmatisate(input) {
+  if (!is.array(input)) {
+    throw new Error('input parameter should be a array');
+  }
+  return input.map((word) => {
+    if (dicoMap.has(word)) {
+      return dicoMap.get(word);
+    }
+    return word;
+  });
+}
+
+/**
+ * Remove noide words from the array and replace remaining words by their lemme.
+ * @function
+ * @param {array} input - Array of words.
+ * @param {boolean} isNoise - Boolean that weather or not remove noise.
+ * @returns {array}
+ */
+
+function cleanData(input, isNoise) {
+  if (!is.boolean(isNoise)) {
+    throw new Error('\'isNoise\' parameter should be a boolean');
+  }
+  if (!is.array(input)) {
+    throw new Error('\'Input\' parameter should be an array');
+  }
+  if (isNoise) {
+    return lemmatisate(cleanNoise(input));
+  }
+  return lemmatisate(input);
+}
+
+/**
+ * Split a string into a array of words.
+ * @function
+ * @param {string} input - Input string.
+ * @returns {array}
+ */
+
+function splitStringInput(input) {
+  if (!is.string(input)) {
+    throw new Error('Parameter input parameter should be a string');
+  }
+  return input.split(regex).filter(word => word !== '');
+}
+
+/**
+ * Count the number of same words in the two arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
+
+function getCommon(first, second) {
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
+  let count = 0;
+  first.forEach((keySecond) => {
+    second.forEach((keyFirst) => {
+      if (keySecond === keyFirst) {
+        count += 1;
+      }
     });
+  });
+  return count;
 }
 
-const countWords = function(){
+/**
+ * Return TFIDF value for the gramm 'gramm'.
+ * @function
+ * @param {string} gramm - word.
+ * @param {array} currentDocument - Input text.
+ * @param {array} corpus - Array of text.
+ * @returns {number}
+ */
+function getTFIDF(gramm, currentDocument, corpus) {
+  return getTF(gramm, currentDocument) * getIDF(gramm, corpus);
 }
 
-const clearHistogram = function (){
-}
-
-const saveData = function (data){
-    // const data = HH.tagCounter;
-    console.log(data)
-    fs.writeFile('configData.json', JSON.stringify(data), (err) => {
-        console.log('Data saved !');
-    });
-}
-
-const run = async function() {
-    let promises = [];
-    for (let file of files.files){
-        promises.push(getFile('./data/' + file.name, file.tags));
+/**
+ * Return the number of common words between 'first' and 'second' arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
+function getUnion(first, second) {
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
+  let count = first.length;
+  second.forEach((keySecond) => {
+    if (!first.some(keyFirst => keySecond === keyFirst)) {
+      count += 1;
     }
-    await Promise.all(promises);
-    // HH.displayTag();
-    getJaccard(...histoArray);
-    saveData(histoArray);
+  });
+  return count;
 }
 
-function getGramm(k, arr){
-    if (!is.number(k))
-        throw new Error("k should be an number");
-    if (!is.array(arr))
-        throw new Error("arr should be an array");
-    let res = [];
-    for (let i = 0; i < arr.length - k + 1; i++){
-        let tmp = [];
-        for (let j = 0; j < k; j++){
-            tmp.push(arr[i + j]);
-        }
-        res.push(tmp);
-    }
-    return res.map(tab => {
-        return tab.join("");
-    });
+/**
+ * Return the Jaccard indice bewteen 'first' and 'second' arrays.
+ * @function
+ * @param {array} first - first array of words.
+ * @param {array} second - second array of words.
+ * @returns {number}
+ */
+function getJaccard(first, second) {
+  if (!is.array(first) || !is.array(second)) {
+    throw new Error('Parameter should be arrays');
+  }
+  return getCommon(first, second) / getUnion(first, second);
 }
-
-function getTF(gramm, arrGramm){
-    if (!is.number(gramm))
-        throw new Error("gramm should be a string");
-    if (!is.array(arrGramm) || arrGramm.length === 0)
-        throw new Error("arrGram should be an array");
-    let count = 0;
-    arrGramm.forEach(element => {
-        if (element === gramm)
-            count++;
-    });
-    return count/arrGramm.length;
-}
-
-function getIDF(gramm, arrCorpus){
-    if (!is.number(gramm))
-        throw new Error("gramm should be a string");
-    if (!is.array(arrCorpus) || arrCorpus.length === 0)
-        throw new Error("arrCorpus should be an array");
-    let count = 0;
-    for (let document of arrCorpus){
-        for (let token of document){
-            if (token === gramm){
-                count++;
-                break;
-            }
-        }
-    }
-    return Math.log10(arrCorpus.length/count);
-}
-
-function getTFIDF(gramm, currentDocument, arrCorpus){
-    return getTF(gramm, currentDocument) * getIDF(gramm, arrCorpus);
-}
-
-function getJaccard(first, second){
-    const total = Object.entries(first).length + Object.entries(second).length;
-    let common = getCommon(first, second);
-    return common/total;
-}
-
-function getIndices(mapEntry){
-    if (!is.object(mapEntry))
-        throw new Error("mapEntry should be an object");
-    const length = Object.entries(mapEntry).length;
-    for (let key in mapEntry){
-        mapEntry[key] /= length;
-    }
-    return mapEntry;
-}
-
-function cleanData(data, isNoise){
-    if (!is.boolean(isNoise)){
-        throw new Error("Variable isNoise should be a boolean");
-    }
-    if (!is.string(data)){
-        throw new Error("Variable data should be a string");
-    }
-    Bruit.add(" ");
-    const words = data.split(regex);
-    const wordsArray = _.countBy(words);
-    const histo = new Map(Object.entries(wordsArray));
-    const modifs = [];
-    if (isNoise){
-        for (let [k, v] of histo.entries()){
-            if (Bruit.has(k.toLowerCase())){
-                histo.delete(k);
-                continue;
-            }
-            if (dicoHisto.has(k.toLowerCase())){
-                histo.delete(k)
-                modifs.push([dicoHisto.get(k.toLowerCase()), v])
-            }
-        }
-    }
-    modifs.forEach(item => {
-        histo.set(item[0], item[1]);
-    })
-    return histo;
-}
-
-function getCommon(first, second){
-    let count = 0;
-    for (let key1 in first){
-        for (let key2 in second){
-            if (key1 === key2){
-                count++;
-            }
-        }
-    }
-    return count;
-}
-// run();
 
 module.exports = {
-    getCommon,
-    cleanData,
-    getIndices,
-    getGramm,
-    getJaccard
-}
+  getCommon,
+  cleanData,
+  getGramm,
+  getJaccard,
+  getTF,
+  getIDF,
+  getTFIDF,
+  splitStringInput,
+  cleanNoise,
+  lemmatisate,
+  getUnion,
+};

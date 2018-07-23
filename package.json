@@ -1,11 +1,14 @@
 {
   "name": "themingjs",
-  "version": "0.0.12",
+  "version": "1.0.0",
   "description": "This is a little project to explore theming using n-gramms and Jaccard index",
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "test": "npx nyc ava --verbose"
+    "test": "npx nyc ava --verbose tests/test.js",
+    "lint": "npx eslint index.js",
+    "lint:fix": "npx eslint --fix index.js",
+    "doc": "npx jsdoc index.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,5 +18,10 @@
     "eslint": "^4.19.1",
     "lodash": "^4.17.10",
     "nyc": "^11.9.0"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "jsdoc": "^3.5.5"
   }
 }
