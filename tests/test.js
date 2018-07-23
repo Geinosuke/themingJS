@@ -1,5 +1,4 @@
 import test from 'ava';
-const constant = require('../constant.js');
 
 const {
   getCommon,
