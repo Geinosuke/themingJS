@@ -80,12 +80,8 @@ function cleanNoise(input) {
   if (!is.array(input)) {
     throw new Error('input parameter should be a array');
   }
-  Noise.add(' '); // refacto
-  return input.map((word) => {
-    if (!Noise.has(word)) {
-      return word;
-    } // return undefined ? or do it with null
-  }).filter(word => word !== undefined);
+  Noise.add(' ');
+  return input.filter(word => !Noise.has(word));
 }
 
 /**
